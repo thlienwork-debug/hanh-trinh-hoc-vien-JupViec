@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hành Trình Học Viên Đối Tác Giúp Việc</title>
+    <style>
+        :root {
+            --primary: #16A34A; /* Xanh lá cây */
+            --primary-dark: #15803D; 
+            --navy: #1E3A8A; /* Xanh dương đậm */
+            --navy-light: #2563EB; /* Xanh dương sáng hơn */
+            --bg-light: #F8FAFC;
+            --text-main: #334155;
+            --text-muted: #64748B;
+            --border: #E2E8F0;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { color: var(--text-main); background: var(--bg-light); line-height: 1.6; display: flex; }
+
+        /* Left Sidebar Navigation */
+        .sidebar {
+            width: 280px; height: 100vh; position: fixed; top: 0; left: 0;
+            background: #ffffff; border-right: 1px solid var(--border); padding: 30px 20px;
+            overflow-y: auto; z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.02);
+        }
+        .logo { font-size: 17px; font-weight: 800; color: var(--navy); margin-bottom: 30px; display: block; text-decoration: none; line-height: 1.4;}
+        .logo span { color: var(--primary); }
+        
+        .sidebar ul { list-style: none; }
+        .sidebar li { margin-bottom: 5px; }
+        .sidebar a {
+            text-decoration: none; color: var(--text-muted); font-weight: 500; font-size: 13.5px; 
+            display: block; padding: 10px 15px; border-radius: 8px; transition: all 0.2s;
+        }
+        .sidebar a:hover { background: var(--bg-light); color: var(--primary); }
+        .sidebar a.active { background: #EFF6FF; color: var(--navy-light); font-weight: 700; border-left: 4px solid var(--navy-light); }
+
+        /* Main Content Area */
+        .main-content { margin-left: 280px; width: calc(100% - 280px); background: #ffffff; min-height: 100vh;}
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 40px; }
+        
+        /* Filter Tags Bar */
+        .filter-wrapper {
+            position: sticky; top: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px);
+            z-index: 100; border-bottom: 1px solid var(--border); padding: 20px 40px;
+            display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .filter-label { font-size: 14px; font-weight: bold; color: var(--navy); margin-right: 10px; }
+        .filter-btn {
+            background: var(--bg-light); border: 1px solid var(--border); color: var(--text-muted);
+            padding: 8px 16px; border-radius: 20px; font-size: 13.5px; font-weight: 600; cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-btn:hover { border-color: var(--navy-light); color: var(--navy-light); }
+        .filter-btn.active { background: var(--navy); color: #ffffff; border-color: var(--navy); box-shadow: 0 4px 6px rgba(30, 58, 138, 0.2); }
+
+        section { padding: 60px 0; border-bottom: 1px dashed var(--border); display: block; animation: fadeIn 0.4s ease; }
+        
+        /* Headers */
+        .section-header { text-align: center; margin-bottom: 50px; }
+        .section-header span { color: var(--primary); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; background: #F0FDF4; padding: 4px 12px; border-radius: 12px; display: inline-block; margin-bottom: 10px;}
+        .section-header h2 { font-size: 26px; color: var(--navy); margin-top: 5px; }
+
+        /* Hero */
+        .hero { padding: 60px 40px; background: linear-gradient(135deg, var(--navy), #172554); color: white; text-align: center; }
+        .hero h1 { font-size: 32px; margin-bottom: 15px; }
+        .hero p { font-size: 16px; opacity: 0.9; max-width: 800px; margin: 0 auto 30px; line-height: 1.5; }
+        
+        .goal-card { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); padding: 25px; border-radius: 12px; max-width: 900px; margin: 0 auto; backdrop-filter: blur(5px); text-align: left; }
+        .goal-card h3 { color: #86EFAC; margin-bottom: 15px; text-align: center; font-size: 18px;}
+        .goal-card ul { margin-left: 20px; font-size: 14.5px; }
+        .goal-card li { margin-bottom: 8px; }
+
+        /* Grids */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+        /* Cards */
+        .card { background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 25px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: transform 0.2s; }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .card h3 { color: var(--navy); font-size: 16px; margin-bottom: 15px; }
+        .card ul { padding-left: 20px; color: var(--text-muted); font-size: 14px; margin-bottom: 15px; }
+        .card ul li { margin-bottom: 8px; }
+        .card ul:last-child { margin-bottom: 0; }
+
+        /* INTERACTIVE CHECKLIST & MULTIPLE IMAGE UPLOAD */
+        .check-group { margin-bottom: 20px; }
+        .check-group h4 { color: var(--navy); margin-bottom: 15px; font-size: 15px; border-left: 4px solid var(--primary); padding-left: 10px;}
+        
+        .upload-btn { display: inline-block; margin-top: 10px; padding: 6px 14px; background: var(--navy-light); color: white; border-radius: 6px; cursor: pointer; font-size: 12.5px; font-weight: 600; transition: background 0.2s; }
+        .upload-btn:hover { background: var(--navy); }
+        .upload-btn input[type="file"] { display: none; }
+        
+        .preview-gallery { display: none; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+        .preview-gallery img, .preview-gallery video { width: 70px; height: 70px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
+        /* INTERACTIVE MODULE CARDS (ACCORDION) */
+        .module-card { background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 15px; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .module-card:hover { border-color: var(--navy-light); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1); }
+        .module-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .module-title { font-size: 14px; font-weight: 700; color: var(--navy); margin: 0; }
+        .module-summary { font-size: 13px; color: var(--text-muted); margin: 5px 0 0 0; }
+        .module-icon { font-size: 14px; color: var(--navy-light); transition: transform 0.3s; margin-left: 10px; margin-top: 2px;}
+        
+        .module-card.active { border-color: var(--navy-light); background: #ffffff; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15); }
+        .module-card.active .module-icon { transform: rotate(180deg); }
+        .module-card.active .module-summary { display: none; }
+        
+        .module-content { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border); font-size: 14px; color: var(--text-main); animation: fadeIn 0.3s ease; }
+        .module-card.active .module-content { display: block; }
+        .module-content ul { padding-left: 20px; margin-bottom: 0; }
+        .module-content li { margin-bottom: 6px; }
+
+        /* Flow & Utilities */
+        .flow-node { background: var(--bg-light); border: 1px solid var(--border); padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; color: var(--navy); margin: 5px auto; width: 100%; max-width: 550px;}
+        .flow-arrow { text-align: center; color: var(--text-muted); font-size: 20px; line-height: 1; margin: 5px 0;}
+        .warning-box { background: #FEF2F2; border-left: 4px solid var(--danger); padding: 15px; border-radius: 0 8px 8px 0; margin-top: 15px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @media (max-width: 992px) { 
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid var(--border); padding: 15px 20px; z-index: 10; }
+            .sidebar ul { display: flex; overflow-x: auto; white-space: nowrap; gap: 10px; padding-bottom: 5px; }
+            .main-content { margin-left: 0; width: 100%; }
+            .container { padding: 0 20px; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .filter-wrapper { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+        <a href="#home" class="logo">🌱 HÀNH TRÌNH HỌC VIÊN<br><span>ĐỐI TÁC GIÚP VIỆC</span></a>
+        <ul>
+            <li><a href="#home">Mục Tiêu Tổng Thể</a></li>
+            <li class="nav-item" data-target="b1"><a href="#b1">Bước 1: Tuyển Dụng & Phân Luồng</a></li>
+            <li class="nav-item" data-target="b2"><a href="#b2">Bước 2: Đào Tạo Lý Thuyết Video</a></li>
+            <li class="nav-item" data-target="b3"><a href="#b3">Bước 3: Kiểm Tra Điều Kiện Sẵn Sàng</a></li>
+            <li class="nav-item" data-target="b4"><a href="#b4">Bước 4: Đo Lường Tiến Độ</a></li>
+            <li class="nav-item" data-target="b5"><a href="#b5">Bước 5: Củng Cố Lý Thuyết & Case Study</a></li>
+            <li class="nav-item" data-target="b6"><a href="#b6">Bước 6: Đào Tạo & Thực Hành</a></li>
+            <li class="nav-item" data-target="b7"><a href="#b7">Bước 7: Đánh Giá Toàn Diện</a></li>
+            <li class="nav-item" data-target="b8"><a href="#b8">Bước 8: Ký Kết Hợp Đồng</a></li>
+            <li class="nav-item" data-target="b9"><a href="#b9">Bước 9: Bắt Đầu Đi Làm</a></li>
+            <li class="nav-item" data-target="b10"><a href="#b10">Bước 10: Giám Sát 10 Ca Đầu</a></li>
+            <li class="nav-item" data-target="b11"><a href="#b11">Bước 11: Chuyển Giao Ổn Định</a></li>
+        </ul>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        
+        <!-- TAG FILTER BAR -->
+        <div class="filter-wrapper">
+            <span class="filter-label">Lọc Theo Giai Đoạn:</span>
+            <button class="filter-btn active" data-filter="all">Tất cả</button>
+            <button class="filter-btn" data-filter="tuyen-dau-vao">Tuyển Dụng & Đầu Vào</button>
+            <button class="filter-btn" data-filter="ly-thuyet">Lý Thuyết</button>
+            <button class="filter-btn" data-filter="thuc-hanh">Thực Hành</button>
+            <button class="filter-btn" data-filter="danh-gia">Đánh Giá & Hợp Đồng</button>
+            <button class="filter-btn" data-filter="di-lam">Đi Làm & Giám Sát</button>
+        </div>
+
+        <!-- Hero -->
+        <header class="hero step-section" id="home" data-tag="all">
+            <div class="container">
+                <h1>HÀNH TRÌNH ĐÀO TẠO CHUẨN HÓA</h1>
+                <p>Hiểu → Thực hành → Đạt → Đồng ý làm việc → Ký hợp đồng → Bắt đầu đi làm → Làm tốt 10 ca đầu tiên</p>
+                
+                <div class="goal-card">
+                    <h3>🌳 Tiêu Chí Làm Tốt 10 Ca Đầu Tiên</h3>
+                    <div>
+                        <ul>
+                            <li>100% không phát sinh khiếu nại hoặc đánh giá từ 3 sao trở xuống.</li>
+                            <li>Đi làm đúng giờ, không tự ý hủy ca, nghỉ ca hoặc vắng mặt không lý do.</li>
+                            <li>Tuân thủ đầy đủ quy trình chuyên môn.</li>
+                            <li>Bắt buộc có tin nhắn xác nhận khối lượng và tin nhắn nghiệm thu trên từng ca.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Bước 1 -->
+        <section id="b1" class="step-section" data-tag="tuyen-dau-vao">
+            <div class="container">
+                <div class="section-header">
+                    <span>Bước 1</span>
+                    <h2>Tuyển Dụng & Phân Hình Thức Thực Hành</h2>
+                    <p>Phụ trách: Bộ phận Tuyển dụng</p>
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3 style="color: var(--navy-light);">Quy trình tiếp nhận</h3>
+                        <ul>
+                            <li>Đăng tuyển, tiếp nhận và phỏng vấn sàng lọc ứng viên.</li>
+                            <li>Hướng dẫn tải ứng dụng, đăng nhập tài khoản và xác nhận lịch học.</li>
+                            <li>Theo dõi tỷ lệ tham gia học, điều phối lịch học bù.</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="border-left: 4px solid var(--primary);">
+                        <h3 style="color: var(--primary-dark);">📌 Ấn định hình thức thực hành theo địa lý</h3>
+                        <ul>
+                            <li><b>Hướng A:</b> Tự thực hành, tự quay video và gửi bài (Khu vực xa/không có cơ sở).</li>
+                            <li><b>Hướng B:</b> Thực hành tập trung có người hướng dẫn kèm (Khu vực có điểm đào tạo).</li>
+                            <li><b>Hướng C:</b> Thực hành thực tế tại nhà khách hàng (Theo điều kiện quy định).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bước 2 -->
+        <section id="b2" class="step-section" data-tag="ly-thuyet">
+            <div class="container">
+                <div class="section-header">
+                    <span>Bước 2</span>
+                    <h2>Đào Tạo Lý Thuyết Qua Video</h2>
+                    <p>Định hướng: 100% bằng video (Không sử dụng slide giảng dạy trực tiếp). Nhấn vào để xem chi tiết.</p>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="module-card" onclick="toggleModule(this)">
+                        <div class="module-header">
+                            <h4 class="module-title">A. Tư duy dịch vụ khách hàng</h4>
+                            <div class="module-icon">▼</div>
+                        </div>
+                        <p class="module-summary">Ý nghĩa nghề, 4 Phẩm chất, 7 Quy tắc dịch vụ...</p>
+                        <div class="module-content">
+                            <ul>
+                                <li><b>Ý nghĩa nghề:</b> Giá trị cho khách hàng & Thu nhập, sự tự hào của người làm nghề.</li>
+                                <li><b>4 Phẩm chất:</b> Chủ động/Trách nhiệm - Tỉ mỉ/Chu đáo - Trung thực/Tin cậy - Có kế hoạch.</li>
+                                <li><b>7 Quy tắc dịch vụ:</b> Diện mạo gọn gàng; Tìm hiểu nhu cầu; Lắng nghe xin lỗi; Tỉ mỉ chi tiết; Xin phép làm bù; Không tọc mạch.</li>
+                                <li><b>Hành vi chuẩn mực:</b> Mỉm cười, cúi chào khi đến và giữ thái độ thân thiện.</li>
+                                <li><b>Bí quyết đạt 5 sao:</b> Vượt mong đợi (làm thêm việc nhỏ), Tinh tế (đặt trả đồ đúng vị trí), Giao tiếp (lễ phép, cầu thị).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="module-card" onclick="toggleModule(this)">
+                        <div class="module-header">
+                            <h4 class="module-title">B. Sử dụng ứng dụng JupViec</h4>
+                            <div class="module-icon">▼</div>
+                        </div>
+                        <p class="module-summary">Lịch làm việc, Lịch ghép, Tin nhắn khách hàng...</p>
+                        <div class="module-content">
+                            <ul>
+                                <li>Hướng dẫn xem lịch, nhận ca mới, theo dõi lịch ghép tự động.</li>
+                                <li>Thao tác tự đăng ký lịch làm việc tự động.</li>
+                                <li>Xem/trả lời tin nhắn khách hàng, đọc thông báo, quy trình báo nghỉ ca.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="module-card" onclick="toggleModule(this)">
+                        <div class="module-header">
+                            <h4 class="module-title">C. Quy trình nghiệp vụ & Chính sách</h4>
+                            <div class="module-icon">▼</div>
+                        </div>
+                        <p class="module-summary">Chốt khối lượng, Ghi nhận ca, Chế tài hủy ca...</p>
+                        <div class="module-content">
+                            <ul>
+                                <li>Các bước xác nhận ca, chốt khối lượng, ghi nhận ca làm việc, nghiệm thu.</li>
+                                <li>Quy định số ca làm theo tuần/tháng; chế tài và mức phạt khi tự ý hủy/nghỉ ca.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="module-card" onclick="toggleModule(this)">
+                        <div class="module-header">
+                            <h4 class="module-title">D. Kỹ năng giao tiếp khách hàng</h4>
+                            <div class="module-icon">▼</div>
+                        </div>
+                        <p class="module-summary">Trình tự giao tiếp, Nguyên tắc chốt khối lượng...</p>
+                        <div class="module-content">
+                            <ul>
+                                <li><b>Trình tự:</b> Liên hệ xác nhận → Trao đổi tìm hiểu nhu cầu → Chốt khối lượng → Nghiệm thu → Chào và cảm ơn.</li>
+                                <li><b>NGUYÊN TẮC BẮT BUỘC:</b> Không chỉ thỏa thuận miệng; BẮT BUỘC nhắn tin chốt khối lượng và nhắn tin nghiệm thu.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="module-card" onclick="toggleModule(this)">
+                        <div class="module-header">
+                            <h4 class="module-title">E. Hóa chất & Dụng cụ chuyên dụng</h4>
+                            <div class="module-icon">▼</div>
+                        </div>
+                        <p class="module-summary">Hóa chất JeeVi, Bộ dụng cụ vệ sinh...</p>
+                        <div class="module-content">
+                            <ul>
+                                <li><b>5 Hóa chất JeeVi:</b> Tẩy bồn cầu, Rửa chén, Lau sàn, Xịt kính & Kem tẩy đa năng.</li>
+                                <li><b>Dụng cụ:</b> Mút tẩy, khăn lau (tiểu/trung/đại), cây lau/nối dài, gạt kính, găng tay, cọ khe kẽ.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="module-card" onclick="toggleModule(this)">
+                        <div class="module-header">
+                            <h4 class="module-title">F. Kỹ năng vệ sinh cơ bản</h4>
+                            <div class="module-icon">▼</div>
+                        </div>
+                        <p class="module-summary">4 Nguyên tắc vàng, Kỹ năng thao tác...</p>
+                        <div class="module-content">
+                            <ul>
+                                <li><b>4 Nguyên tắc vàng:</b> Trên → Dưới; Trái → Phải; Trong → Ngoài; Sạch → Bẩn.</li>
+                                <li><b>Kỹ năng thao tác:</b> Lau kính, sắp xếp đồ đạc, kỹ thuật lau bàn.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="module-card" onclick="toggleModule(this)">
+                        <div class="module-header">
+                            <h4 class="module-title">G. Quy trình vệ sinh từng khu vực</h4>
+                            <div class="module-icon">▼</div>
+                        </div>
+                        <p class="module-summary">Phòng khách, Phòng ngủ, Bếp, Toilet...</p>
+                        <div class="module-content">
+                            <ul>
+                                <li>Quy trình làm sạch chuẩn: Phòng khách, Phòng ngủ, Bếp, Toilet.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="module-card" onclick="toggleModule(this)">
+                        <div class="module-header">
+                            <h4 class="module-title">H. Nghiệp vụ ủi đồ cơ bản</h4>
+                            <div class="module-icon">▼</div>
+                        </div>
+                        <p class="module-summary">Bàn ủi, Áo sơ mi, Quần tây, Gấp đồ...</p>
+                        <div class="module-content">
+                            <ul>
+                                <li>Sử dụng bàn ủi và phân biệt tính chất từng loại vải.</li>
+                                <li>Kỹ thuật ủi áo sơ mi và quần tây/quần âu có ly.</li>
+                                <li>Kỹ thuật gấp gọn và treo đồ sau khi ủi.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bước 3 -->
+        <section id="b3" class="step-section" data-tag="tuyen-dau-vao" style="background: var(--bg-light);">
+            <div class="container">
+                <div class="section-header">
+                    <span>Bước 3</span>
+                    <h2>Kiểm Tra Điều Kiện Sẵn Sàng (Đầu Vào)</h2>
+                    <p>Phụ trách: Chuyên viên đào tạo kiểm tra trực tiếp trên hệ thống V4</p>
+                </div>
+
+                <div class="card" style="max-width: 850px; margin: 0 auto; background: #ffffff;">
+                    
+                    <div class="check-group">
+                        <h4 style="color: var(--navy-light);">1. Kiểm tra tự động trên hệ thống V4 (Chuyên viên đào tạo kiểm tra)</h4>
+                        <ul style="font-size: 14px; margin-left: 20px; color: var(--text-main);">
+                            <li style="margin-bottom: 8px;"><b>Xác nhận tham gia học:</b> Hệ thống V4 kiểm tra học viên đã nhắn tin xác nhận tham gia buổi học chưa.</li>
+                            <li><b>Tiến độ học bài:</b> Hệ thống V4 kiểm tra học viên đã hoàn thành học bài trên ứng dụng hay chưa.</li>
+                        </ul>
+                    </div>
+
+                    <div class="check-group" style="margin-top: 30px;">
+                        <h4 style="color: var(--navy-light);">2. Tiêu chuẩn Tác phong & Diện mạo (Chuyên viên đào tạo kiểm tra - Không đạt 1 nội dung LOẠI NGAY)</h4>
+                        
+                        <div class="grid-2" style="margin-top: 15px;">
+                            <div style="background: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+                                <b style="color: var(--navy);">📌 Tiêu chuẩn Tóc (Ô 1)</b>
+                                <p style="font-size: 13px; margin-top: 5px;">Tóc bắt buộc cột cao gọn gàng, không thả rông, không xõa. (Không đạt: Loại ngay)</p>
+                                <label class="upload-btn">+ Tải ảnh minh chứng (Nhiều ảnh)
+                                    <input type="file" accept="image/*" multiple onchange="previewMultipleFiles(this)">
+                                </label>
+                                <div class="preview-gallery"></div>
+                            </div>
+                            <div style="background: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+                                <b style="color: var(--navy);">📌 Tiêu chuẩn Áo (Ô 2)</b>
+                                <p style="font-size: 13px; margin-top: 5px;">Áo thun có cổ (kiểu áo polo), màu sắc đúng quy định. (Không đạt: Loại ngay)</p>
+                                <label class="upload-btn">+ Tải ảnh minh chứng (Nhiều ảnh)
+                                    <input type="file" accept="image/*" multiple onchange="previewMultipleFiles(this)">
+                                </label>
+                                <div class="preview-gallery"></div>
+                            </div>
+                            <div style="background: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-top: 15px;">
+                                <b style="color: var(--navy);">📌 Tiêu chuẩn Quần (Ô 3)</b>
+                                <p style="font-size: 13px; margin-top: 5px;">Quần đen trơn, không họa tiết, chiều dài dài chạm mắt cá chân. (Không đạt: Loại ngay)</p>
+                                <label class="upload-btn">+ Tải ảnh minh chứng (Nhiều ảnh)
+                                    <input type="file" accept="image/*" multiple onchange="previewMultipleFiles(this)">
+                                </label>
+                                <div class="preview-gallery"></div>
+                            </div>
+                            <div style="background: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-top: 15px;">
+                                <b style="color: var(--danger);">📌 Kiểm tra Hình xăm (Ô 4)</b>
+                                <p style="font-size: 13px; margin-top: 5px;">Phát hiện không trung thực giấu hình xăm $\rightarrow$ <b>Loại ngay</b>. Nếu do lỗi từ phía Tuyển dụng $\rightarrow$ Dừng kiểm tra, báo lại bộ phận Tuyển dụng để xử lý.</p>
+                                <label class="upload-btn">+ Tải ảnh minh chứng (Nhiều ảnh)
+                                    <input type="file" accept="image/*" multiple onchange="previewMultipleFiles(this)">
+                                </label>
+                                <div class="preview-gallery"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="check-group" style="margin-top: 30px;">
+                        <h4 style="color: var(--navy-light);">3. Tiêu chuẩn Không gian, Thời gian & Thái độ (Chuyên viên đào tạo đánh giá)</h4>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+                            <div style="background: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+                                <b style="color: var(--navy);">🏠 Quy định Không gian học tập (Ô 5)</b>
+                                <p style="font-size: 13px; margin-top: 5px;">Bắt buộc ở trong nhà, không gian trống cố định, yên tĩnh. <b>Tuyệt đối cấm:</b> Chạy xe ngoài đường học, vừa đưa rước con học $\rightarrow$ <b>Loại ngay lập tức</b>.</p>
+                                <label class="upload-btn">+ Tải ảnh minh chứng (Nhiều ảnh)
+                                    <input type="file" accept="image/*" multiple onchange="previewMultipleFiles(this)">
+                                </label>
+                                <div class="preview-gallery"></div>
+                            </div>
+                            <div style="background: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+                                <b style="color: var(--navy);">⏰ Quy định Thời gian học (Ô 6)</b>
+                                <p style="font-size: 13px; margin-top: 5px;">Học viên phải vào học đúng giờ quy định. Tuyệt đối không cho phép đi trễ. Đi trễ $\rightarrow$ Không cho vào lớp/Loại.</p>
+                                <label class="upload-btn">+ Tải ảnh minh chứng (Nhiều ảnh)
+                                    <input type="file" accept="image/*" multiple onchange="previewMultipleFiles(this)">
+                                </label>
+                                <div class="preview-gallery"></div>
+                            </div>
+                            <div style="background: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+                                <b style="color: var(--navy);">🤝 Bảng Checklist Đánh giá Thái độ với Chuyên viên đào tạo (Ô 7)</b>
+                                <ul style="font-size: 13px; margin-top: 8px; margin-left: 20px;">
+                                    <li>[ ] Lắng nghe tập trung, phản hồi lịch sự, tôn trọng chuyên viên đào tạo.</li>
+                                    <li>[ ] Không có thái độ cộc cằn, chống đối, ngắt lời hoặc thiếu hợp tác.</li>
+                                    <li>[ ] Tiếp thu góp ý và trả lời rõ ràng các câu hỏi kiểm tra nhanh.</li>
+                                </ul>
+                                <p style="font-size: 12.5px; color: var(--danger); margin-top: 5px; font-weight: bold;">(Không đạt thái độ $\rightarrow$ Loại ngay lập tức).</p>
+                                <label class="upload-btn">+ Tải ảnh minh chứng (Nhiều ảnh)
+                                    <input type="file" accept="image/*" multiple onchange="previewMultipleFiles(this)">
+                                </label>
+                                <div class="preview-gallery"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Bước 4 -->
+        <section id="b4" class="step-section" data-tag="ly-thuyet" style="background: var(--bg-light);">
+            <div class="container">
+                <div class="section-header">
+                    <span>Bước 4</span>
+                    <h2>Đo Lường Tiến Độ Hoàn Thành Video</h2>
+                    <p>Phụ trách: Bộ phận Tuyển dụng / Người đào tạo</p>
+                </div>
+
+                <div class="grid-3">
+                    <div class="card" style="border-top: 4px solid var(--primary); text-align: center;">
+                        <div style="font-weight:bold; font-size:20px; color:var(--primary); margin-bottom: 10px;">Hoàn thành 100%</div>
+                        <p style="font-size:13.5px; margin:0;">Đạt chuẩn, chuyển thẳng sang giai đoạn Củng cố & Thực hành.</p>
+                    </div>
+                    <div class="card" style="border-top: 4px solid var(--warning); text-align: center;">
+                        <div style="font-weight:bold; font-size:20px; color:var(--warning); margin-bottom: 10px;">Đạt từ 80% – 99%</div>
+                        <p style="font-size:13.5px; margin:0;">Cho phép tham gia củng cố nhưng <b>BẮT BUỘC học bù xong</b> trước giờ thực hành.</p>
+                    </div>
+                    <div class="card" style="border-top: 4px solid var(--danger); text-align: center;">
+                        <div style="font-weight:bold; font-size:20px; color:var(--danger); margin-bottom: 10px;">Đạt dưới 80%</div>
+                        <p style="font-size:13.5px; margin:0;">KHÔNG ĐƯỢC THỰC HÀNH. Yêu cầu hoàn thành đủ video lý thuyết trước.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bước 5 (Đã bổ sung thời lượng 2 tiếng) -->
+        <section id="b5" class="step-section" data-tag="ly-thuyet">
+            <div class="container">
+                <div class="section-header">
+                    <span>Bước 5</span>
+                    <h2>Củng Cố Lý Thuyết & Case Study Trước Khi Thực Hành</h2>
+                    <p>Phụ trách: Người đào tạo | <b>Thời lượng: 2 tiếng</b></p>
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3 style="color: var(--navy-light);">🎬 1. Trình chiếu video trọng tâm</h3>
+                        <ul style="font-size: 13.5px; padding-left: 15px;">
+                            <li>Hướng dẫn tư duy dịch vụ khách hàng & Bí quyết 5 sao.</li>
+                            <li>Hướng dẫn sử dụng ứng dụng JupViec & Quy trình ghi nhận ca.</li>
+                            <li>Hướng dẫn cách chốt khối lượng và nhắn tin nghiệm thu.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 style="color: var(--navy-light);">🃏 2. Thẻ ghi nhớ (Flashcard)</h3>
+                        <ul style="font-size: 13.5px; padding-left: 15px;">
+                            <li>Tăng cường tối đa thời lượng học và luyện phản xạ từ khóa.</li>
+                            <li>Thuộc lòng các bước thao tác chuẩn và nguyên tắc vệ sinh.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="grid-2" style="margin-top: 20px;">
+                    <div class="card">
+                        <h3 style="color: var(--navy-light);">❓ 3. Bộ câu hỏi kiểm tra</h3>
+                        <p style="font-size: 13.5px; margin:0;">Thiết kế ~10 câu hỏi/chủ đề video (~50 câu tổng) đánh giá độ hiểu sâu.</p>
+                    </div>
+                    <div class="card" style="border-left: 4px solid var(--primary);">
+                        <h3 style="color: var(--primary-dark);">💡 4. Thảo luận Case Study (Tình huống thực tế)</h3>
+                        <p style="font-size: 13.5px; margin:0;">Phân tích các tình huống giả định thực tế tại nhà khách hàng để học viên luyện tập tư duy xử lý sự cố, phản xạ giao tiếp chuẩn 5 sao trước khi bước vào thực hành.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bước 6 (Đã bổ sung thời lượng 2 tiếng) -->
+        <section id="b6" class="step-section" data-tag="thuc-hanh" style="background: var(--bg-light);">
+            <div class="container">
+                <div class="section-header">
+                    <span>Bước 6</span>
+                    <h2>Đào Tạo & Thực Hành (Theo 3 Hình Thức)</h2>
+                    <p style="font-size: 14px; font-weight: bold; color: var(--primary-dark); margin-bottom: 5px;">⏱ Thời lượng: 2 tiếng</p>
+                    <p style="font-style: italic; color: var(--navy-light); font-weight: 600;">(Học viên được tự do lựa chọn hình thức thực hành phù hợp với bản thân)</p>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="card" style="border-left: 4px solid var(--primary);">
+                        <h3 style="color: var(--navy);">📹 HÌNH THỨC A: Tự thực hành & gửi bài</h3>
+                        <ul style="font-size: 13.5px;">
+                            <li><b>Tiêu chuẩn trang phục:</b> Áo thun có cổ, tối màu + Quần đen trơn dài.</li>
+                            <li><b>Trình tự nộp:</b> Giới thiệu → Quay dụng cụ → Ảnh hiện trạng → Video thao tác → 4 Ảnh nghiệm thu.</li>
+                            <li><b>Thời gian phản hồi:</b> Phản hồi trong 4 giờ (Giờ hành chính) hoặc 12 giờ (Ngoài giờ hành chính).</li>
+                        </ul>
+                        <div style="background: #F0FDF4; border: 1px dashed var(--primary); margin-top: 15px; padding: 15px; border-radius: 8px;">
+                            <p style="font-size: 13.5px; font-weight: bold; margin-bottom: 8px;">Khu vực nộp bài Hình Thức A (Tải nhiều ảnh/video):</p>
+                            <label class="upload-btn">
+                                + Chọn tệp tải lên
+                                <input type="file" accept="image/*,video/*" multiple onchange="previewMultipleFiles(this)">
+                            </label>
+                            <div class="preview-gallery"></div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <div class="card" style="border-left: 4px solid var(--navy-light);">
+                            <h3 style="color: var(--navy);">👥 HÌNH THỨC B: Tại điểm đào tạo</h3>
+                            <ul style="font-size: 13.5px; margin-bottom: 0;">
+                                <li>Có người hướng dẫn quan sát, uốn nắn tư thế và sửa lỗi tại chỗ.</li>
+                                <li>Thực hành phân vai: Người làm, người hỗ trợ và nhận xét chéo.</li>
+                            </ul>
+                        </div>
+                        <div class="card" style="border-left: 4px solid var(--warning);">
+                            <h3 style="color: var(--navy);">🏠 HÌNH THỨC C: Tại nhà khách hàng</h3>
+                            <ul style="font-size: 13.5px; margin-bottom: 0;">
+                                <li>Ca thực hành MIỄN PHÍ, KHÔNG tính vào 10 ca đầu tiên.</li>
+                                <li>Bãi đỗ xe an toàn, không gian đủ rộng, có bàn ủi đồ.</li>
+                                <li>BẮT BUỘC có khách hàng quan sát trực tiếp và đánh giá qua Bảng kiểm.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 25px;">
+                    <h3 style="color: var(--navy-light); text-align: center;">📋 QUY ĐỊNH CHI TIẾT KHI QUAY VIDEO THỰC HÀNH & CÁC LỖI BỊ LOẠI NGAY</h3>
+                    <div class="grid-2" style="margin-top: 20px;">
+                        <div style="background: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+                            <h4 style="font-size: 14px; color: var(--navy); margin-bottom: 8px;">🎥 Nội dung bắt buộc phải thấy trong video:</h4>
+                            <ul style="font-size: 13px; padding-left: 15px; margin: 0;">
+                                <li><b>Phần mở đầu:</b> Phải thấy rõ mặt và nghe rõ tiếng học viên nói trực tiếp: <i>"Tôi tên là [Họ tên], hôm nay ngày [Ngày/Tháng], tôi thực hành..."</i> (Không lồng tiếng).</li>
+                                <li><b>Phần công cụ:</b> Quay cận cảnh toàn bộ hóa chất JeeVi và dụng cụ chuẩn bị.</li>
+                                <li><b>Phần an toàn:</b> Quay rõ thao tác tự kiểm tra thiết bị, dây điện bàn ủi (nếu làm bài ủi đồ).</li>
+                                <li><b>Phần thao tác:</b> Góc máy dọc từ trên xuống, thấy trọn vẹn chuyển động tay và kỹ thuật xử lý.</li>
+                            </ul>
+                        </div>
+                        <div style="background: #FEF2F2; padding: 15px; border-radius: 8px; border: 1px solid var(--danger);">
+                            <h4 style="font-size: 14px; color: var(--danger); margin-bottom: 8px;">❌ Các lỗi BỊ LOẠI NGAY LẬP TỨC:</h4>
+                            <ul style="font-size: 13px; padding-left: 15px; margin: 0; color: var(--text-main);">
+                                <li>Video cắt ghép, chỉnh sửa hiệu ứng, tua nhanh đoạn thao tác.</li>
+                                <li>Không thấy rõ mặt học viên hoặc không có đoạn tự giới thiệu trực tiếp ở đầu video.</li>
+                                <li>Sử dụng sai dụng cụ / hóa chất quy định.</li>
+                                <li>Thao tác cẩu thả, qua loa, thiếu trung thực.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bước 7 -->
+        <section id="b7" class="step-section" data-tag="danh-gia">
+            <div class="container">
+                <div class="section-header">
+                    <span>Bước 7</span>
+                    <h2>Đánh Giá Toàn Diện Đầu Ra</h2>
+                    <p>Bộ phận ra quyết định cuối cùng: Bộ phận Chăm sóc nhân viên</p>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="card">
+                        <h3 style="color: var(--navy);">Đánh giá Lý thuyết</h3>
+                        <ul style="font-size: 14px;">
+                            <li>Bộ phận Chăm sóc nhân viên kiểm tra độc lập qua gọi điện thoại hỏi đáp trực tiếp.</li>
+                            <li>Nếu chưa đạt: Xếp lịch học lại trong vòng 3 ngày.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3 style="color: var(--navy);">Đánh giá Thực hành</h3>
+                        <ul style="font-size: 14px;">
+                            <li>Đánh giá bài thi thực hành độc lập theo bảng kiểm chuẩn.</li>
+                            <li>Cử nhân sự thứ hai đánh giá lại khi có trường hợp người thứ nhất chấm CHƯA ĐẠT.</li>
+                            <li>Nếu cả 2 chấm CHƯA ĐẠT → Bắt buộc đào tạo lại.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bước 8 -->
+        <section id="b8" class="step-section" data-tag="danh-gia" style="background: var(--bg-light);">
+            <div class="container">
+                <div class="section-header">
+                    <span>Bước 8</span>
+                    <h2>Ký Kết Hợp Đồng & Trang Bị Làm Việc</h2>
+                </div>
+                <div class="card" style="max-width: 600px; margin: 0 auto; text-align: center; background: #ffffff;">
+                    <p style="font-size: 14.5px; font-weight: bold; color: var(--navy); margin-bottom: 20px;">Điều kiện tiên quyết: Đạt đồng thời cả Lý thuyết và Thực hành</p>
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <div style="background: #F0FDF4; padding: 15px; border-radius: 8px; border: 1px solid var(--primary);">
+                            <b>1. Ký kết hợp đồng hợp tác chính thức</b>
+                        </div>
+                        <div style="background: #F0FDF4; padding: 15px; border-radius: 8px; border: 1px solid var(--primary);">
+                            <b>2. Mua / Nhận bàn giao bộ dụng cụ và hóa chất chuyên dụng JeeVi</b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bước 9 -->
+        <section id="b9" class="step-section" data-tag="di-lam" style="background: var(--navy); color: white;">
+            <div class="container">
+                <div class="section-header" style="margin-bottom: 30px;">
+                    <span style="color:#86EFAC; background: rgba(255,255,255,0.1);">Bước 9</span>
+                    <h2 style="color: white;">Bắt Đầu Đi Làm</h2>
+                </div>
+                <div style="text-align: center; max-width: 700px; margin: 0 auto;">
+                    <p style="font-size: 16px; line-height: 1.6; opacity: 0.9;">
+                        Học viên kích hoạt tài khoản trên ứng dụng JupViec và bắt đầu nhận ca làm việc thực tế.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bước 10 -->
+        <section id="b10" class="step-section" data-tag="di-lam">
+            <div class="container">
+                <div class="section-header">
+                    <span>Bước 10</span>
+                    <h2>Giám Sát & Đồng Hành 10 Ca Đầu Tiên</h2>
+                    <p>Phụ trách phối hợp: Người đào tạo + Tổ trưởng khu vực</p>
+                </div>
+
+                <div class="grid-3">
+                    <div class="card" style="border-top: 4px solid var(--navy-light);">
+                        <h4 style="color:var(--navy); margin-bottom:5px;">Điểm kiểm tra 1</h4>
+                        <p style="font-weight:600; font-size:14px; color:var(--primary-dark); margin-bottom:5px;">Ngay trong ca đầu tiên</p>
+                    </div>
+                    <div class="card" style="border-top: 4px solid var(--navy-light);">
+                        <h4 style="color:var(--navy); margin-bottom:5px;">Điểm kiểm tra 2</h4>
+                        <p style="font-weight:600; font-size:14px; color:var(--primary-dark); margin-bottom:5px;">Sau 3 ngày làm việc</p>
+                        <p style="font-size:13px; color:var(--text-main); margin:0;">(Trước ngày thứ 7)</p>
+                    </div>
+                    <div class="card" style="border-top: 4px solid var(--navy-light);">
+                        <h4 style="color:var(--navy); margin-bottom:5px;">Điểm kiểm tra 3</h4>
+                        <p style="font-weight:600; font-size:14px; color:var(--primary-dark); margin-bottom:5px;">Trước ca thứ 10</p>
+                        <p style="font-size:13px; color:var(--text-main); margin:0;">(Trước ngày làm việc thứ 15)</p>
+                    </div>
+                </div>
+
+                <div class="warning-box" style="max-width: 900px; margin: 30px auto 0;">
+                    <b style="color: var(--danger); font-size: 15px;">📌 XỬ LÝ KHI NHẬN ĐÁNH GIÁ TỪ 3 SAO TRỞ XUỐNG:</b>
+                    <ul style="font-size: 14px; margin-top: 10px; color: var(--navy);">
+                        <li><b>Bước 1:</b> Người đào tạo / Bộ phận Chăm sóc khách hàng ngay lập tức kiểm tra thông tin ca làm trên hệ thống.</li>
+                        <li><b>Bước 2:</b> Liên hệ trao đổi TRỰC TIẾP bằng miệng (gọi điện thoại) hoặc qua tin nhắn Zalo với học viên để đối chiếu thông tin và xác định nguyên nhân.</li>
+                        <li><b>Bước 3:</b> Nhắc nhở, chấn chỉnh thái độ/kỹ năng và hướng dẫn cách khắc phục lỗi ngay lập tức để không lặp lại ở ca tiếp theo.</li>
+                        <li style="color: var(--text-muted); font-style: italic;">Quy trình được thực hiện thủ công, linh hoạt, đảm bảo tính con người, không áp dụng tự động hóa chặn ứng dụng.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bước 11 -->
+        <section id="b11" class="step-section" data-tag="di-lam" style="background: var(--bg-light);">
+            <div class="container">
+                <div class="section-header">
+                    <span>Bước 11</span>
+                    <h2>Chuyển Giao Làm Việc Ổn Định</h2>
+                </div>
+                
+                <div class="grid-2">
+                    <div style="background: #ffffff; padding: 25px; border-radius: 12px; border: 1px solid var(--border); text-align: center;">
+                        <div class="flow-node">Hoàn thành tốt 10 ca đầu tiên</div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-node">Duy trì chất lượng sao ổn định</div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-node" style="background: var(--primary); color: white; border: none;">Bàn giao sang Bộ phận Vận hành quản lý dài hạn</div>
+                    </div>
+
+                    <div style="padding: 25px; background: #F0FDF4; border-left: 4px solid var(--primary); border-radius: 0 8px 8px 0; color: var(--navy); display: flex; flex-direction: column; justify-content: center;">
+                        <h4 style="color: var(--primary-dark); margin-bottom: 15px; font-size: 16px;">🌱 MỤC TIÊU CỐT LÕI</h4>
+                        <p style="font-size: 14px; opacity: 0.95; font-style: italic; line-height: 1.6;">
+                            Hành trình khép lại khi đối tác đã hoàn toàn làm chủ được công việc, nhận được phản hồi tốt từ khách hàng và sẵn sàng đồng hành lâu dài cùng hệ thống.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- 1. HỆ THỐNG FILTER TAGS ---
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const sections = document.querySelectorAll('.step-section');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const filterValue = btn.getAttribute('data-filter');
+
+                sections.forEach(sec => {
+                    if (filterValue === 'all' || sec.getAttribute('data-tag') === filterValue) {
+                        sec.style.display = 'block';
+                    } else {
+                        if(sec.id === 'home') {
+                            sec.style.display = 'block';
+                        } else {
+                            sec.style.display = 'none';
+                        }
+                    }
+                });
+
+                navItems.forEach(item => {
+                    const targetId = item.getAttribute('data-target');
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection && targetSection.style.display !== 'none') {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        // --- 2. HÀM XEM TRƯỚC NHIỀU ẢNH/VIDEO ---
+        function previewMultipleFiles(input) {
+            const gallery = input.parentElement.nextElementSibling;
+            gallery.innerHTML = '';
+            gallery.style.display = 'flex';
+
+            if (input.files && input.files.length > 0) {
+                Array.from(input.files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        if(file.type.startsWith('video/')) {
+                            const video = document.createElement('video');
+                            video.src = e.target.result;
+                            video.controls = true;
+                            gallery.appendChild(video);
+                        } else {
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            gallery.appendChild(img);
+                        }
+                    }
+                    reader.readAsDataURL(file);
+                });
+            } else {
+                gallery.style.display = 'none';
+            }
+        }
+        
+        // --- 3. ĐÓNG/MỞ MODULE CARD (ACCORDION) ---
+        function toggleModule(element) {
+            element.classList.toggle('active');
+        }
+
+        // --- 4. SCROLL HIGHLIGHT THANH SIDEBAR ---
+        const navLinks = document.querySelectorAll(".sidebar a");
+
+        window.addEventListener("scroll", () => {
+            let current = "";
+            sections.forEach(section => {
+                if(section.style.display !== 'none') {
+                    const sectionTop = section.offsetTop;
+                    if (scrollY >= (sectionTop - 150)) {
+                        current = section.getAttribute("id");
+                    }
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove("active");
+                if (link.getAttribute("href") === `#${current}`) {
+                    link.classList.add("active");
+                }
+            });
+        });
+    </script>
+</body>
+</html>
